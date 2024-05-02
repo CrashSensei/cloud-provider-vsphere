@@ -53,6 +53,10 @@ type Global struct {
 	// 2) we are not in a k8s env, namely DC/OS, since CSI is CO agnostic
 	// Default: /etc/cloud/credentials
 	SecretsDirectory string
+	// The IP Prefix to match for mapping (defaults: 198.51.100.)
+	IPMapPrefix string
+	// What to replace the prefix with
+	IPMapValue string
 }
 
 // VirtualCenterConfig struct

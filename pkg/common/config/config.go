@@ -18,6 +18,7 @@ package config
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -278,6 +279,27 @@ func ReadConfig(byConfig []byte) (*Config, error) {
 	if err := cfg.FromEnv(); err != nil {
 		klog.Errorf("FromEnv failed: %s", err)
 		return nil, err
+	}
+
+	if cfg.Global.IPMapPrefix != "" {
+		if cfg.Global.IPMapValue == "" {
+			klog.Errorf("VSPHERE_IPMAP_PREFIX specified (%s) with no VSPHERE_IPMAP_VALUE", cfg.Global.IPMapPrefix)
+			cfg.Global.IPMapPrefix = ""
+		} else {
+			ip := net.ParseIP(cfg.Global.IPMapPrefix + "1")
+			if ip == nil {
+				klog.Errorf("Invalid IPMap Prefix(%s)", cfg.Global.IPMapPrefix)
+				cfg.Global.IPMapPrefix = ""
+				cfg.Global.IPMapValue = ""
+			} else {
+				ip := net.ParseIP(cfg.Global.IPMapValue + "1")
+				if ip == nil {
+					klog.Errorf("Invalid IPMap Value(%s)", cfg.Global.IPMapValue)
+					cfg.Global.IPMapPrefix = ""
+					cfg.Global.IPMapValue = ""
+				}
+			}
+		}
 	}
 
 	klog.Info("Config initialized")

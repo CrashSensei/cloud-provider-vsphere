@@ -69,6 +69,10 @@ type GlobalYAML struct {
 	// ipv4 - IPv4 addresses only (Default)
 	// ipv6 - IPv6 addresses only
 	IPFamilyPriority []string `yaml:"ipFamily"`
+	// The IP Prefix to match for mapping (defaults: 198.51.100.)
+	IPMapPrefix string `yaml:"ipMapPrefix"`
+	// What to replace the prefix with
+	IPMapValue string `yaml:"ipMapValue"`
 }
 
 // VirtualCenterConfigYAML contains information used to access a remote vCenter

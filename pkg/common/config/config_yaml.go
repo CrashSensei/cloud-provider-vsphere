@@ -18,6 +18,7 @@ package config
 
 import (
 	"fmt"
+	"net"
 	"strings"
 
 	yaml "gopkg.in/yaml.v2"
@@ -49,6 +50,8 @@ func (ccy *CommonConfigYAML) CreateConfig() *Config {
 	cfg.Global.SecretName = ccy.Global.SecretName
 	cfg.Global.SecretNamespace = ccy.Global.SecretNamespace
 	cfg.Global.SecretsDirectory = ccy.Global.SecretsDirectory
+	cfg.Global.IPMapPrefix = ccy.Global.IPMapPrefix
+	cfg.Global.IPMapValue = ccy.Global.IPMapValue
 
 	for keyVcConfig, valVcConfig := range ccy.Vcenter {
 		cfg.VirtualCenter[keyVcConfig] = &VirtualCenterConfig{
@@ -127,6 +130,22 @@ func (ccy *CommonConfigYAML) validateConfig() error {
 	if len(ccy.Vcenter) == 0 {
 		klog.Error(ErrMissingVCenter)
 		return ErrMissingVCenter
+	}
+
+	if ccy.Global.IPMapPrefix != "" {
+		if ccy.Global.IPMapValue == "" {
+			return ErrMissingIPMapValue
+		} else {
+			ip := net.ParseIP(ccy.Global.IPMapPrefix + "1")
+			if ip == nil {
+				return ErrInvalidIpMapPrefix
+			} else {
+				ip := net.ParseIP(ccy.Global.IPMapValue + "1")
+				if ip == nil {
+					return ErrInvalidIPMapValue
+				}
+			}
+		}
 	}
 
 	// vsphere.conf is no longer supported in the old format.

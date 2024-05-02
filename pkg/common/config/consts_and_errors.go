@@ -47,6 +47,8 @@ const (
 
 	// DefaultCredentialManager used for the Global CredMgr/Lister
 	DefaultCredentialManager string = "Global"
+
+	DefaultIPMapPrefix string = "198.51.100."
 )
 
 var (
@@ -66,4 +68,10 @@ var (
 
 	// ErrInvalidIPFamilyType is returned when an invalid IPFamily type is encountered
 	ErrInvalidIPFamilyType = errors.New("Invalid IP Family type")
+
+	ErrInvalidIpMapPrefix = errors.New("Invalid IP Prefix")
+
+	ErrMissingIPMapValue = errors.New("Missing IP Map Value")
+
+	ErrInvalidIPMapValue = errors.New("Invalid IP Map Value")
 )

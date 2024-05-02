@@ -327,15 +327,35 @@ func (nm *NodeManager) DiscoverNode(nodeID string, searchBy cm.FindVM) error {
 			ipFamily, discoveredInternal, discoveredExternal)
 
 		if discoveredInternal != nil {
-			v1helper.AddToNodeAddresses(&addrs,
-				v1.NodeAddress{Type: v1.NodeInternalIP, Address: discoveredInternal.ipAddr},
-			)
+			if nm.cfg.Global.IPMapPrefix != "" {
+				if strings.HasPrefix(discoveredInternal.ipAddr, nm.cfg.Global.IPMapPrefix) {
+					mappedIpAddr := strings.Replace(discoveredInternal.ipAddr, nm.cfg.Global.IPMapPrefix, nm.cfg.Global.IPMapValue, 1)
+					klog.V(2).Infof("Remaping Internal IP (%s) to (%s)", discoveredInternal.ipAddr, mappedIpAddr)
+					v1helper.AddToNodeAddresses(&addrs,
+						v1.NodeAddress{Type: v1.NodeInternalIP, Address: mappedIpAddr},
+					)
+				}
+			} else {
+				v1helper.AddToNodeAddresses(&addrs,
+					v1.NodeAddress{Type: v1.NodeInternalIP, Address: discoveredInternal.ipAddr},
+				)
+			}
 		}
 
 		if discoveredExternal != nil {
-			v1helper.AddToNodeAddresses(&addrs,
-				v1.NodeAddress{Type: v1.NodeExternalIP, Address: discoveredExternal.ipAddr},
-			)
+			if nm.cfg.Global.IPMapPrefix != "" {
+				if strings.HasPrefix(discoveredExternal.ipAddr, nm.cfg.Global.IPMapPrefix) {
+					mappedIpAddr := strings.Replace(discoveredExternal.ipAddr, nm.cfg.Global.IPMapPrefix, nm.cfg.Global.IPMapValue, 1)
+					klog.V(2).Infof("Remaping External IP (%s) to (%s)", discoveredExternal.ipAddr, mappedIpAddr)
+					v1helper.AddToNodeAddresses(&addrs,
+						v1.NodeAddress{Type: v1.NodeExternalIP, Address: mappedIpAddr},
+					)
+				}
+			} else {
+				v1helper.AddToNodeAddresses(&addrs,
+					v1.NodeAddress{Type: v1.NodeExternalIP, Address: discoveredExternal.ipAddr},
+				)
+			}
 		}
 
 		if len(oVM.Guest.Net) > 0 {
